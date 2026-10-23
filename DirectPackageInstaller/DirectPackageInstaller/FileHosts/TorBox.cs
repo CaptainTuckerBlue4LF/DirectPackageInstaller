@@ -50,7 +50,7 @@ namespace DirectPackageInstaller.FileHosts
 
                 if (IsReady(item))
                 {
-                    var fileId = GetOptionalId(item, "file_id", "id");
+                    var fileId = GetFileId(item);
                     var requestUrl = ApiBase + "/requestdl?token=" + Uri.EscapeDataString(App.Config.TorBoxApiKey)
                         + "&web_id=" + webDownloadId
                         + "&file_id=" + fileId
@@ -111,6 +111,15 @@ namespace DirectPackageInstaller.FileHosts
             if (item.TryGetProperty("files", out var files) && files.ValueKind == JsonValueKind.Array && files.GetArrayLength() > 0)
                 return GetOptionalId(files[0], names);
 
+            return 0;
+        }
+
+        private static int GetFileId(JsonElement item)
+        {
+            if (item.TryGetProperty("files", out var files) && files.ValueKind == JsonValueKind.Array && files.GetArrayLength() > 0)
+                return GetOptionalId(files[0], "file_id", "id");
+
+            // The API defaults file_id to 0, which selects the first file.
             return 0;
         }
 
