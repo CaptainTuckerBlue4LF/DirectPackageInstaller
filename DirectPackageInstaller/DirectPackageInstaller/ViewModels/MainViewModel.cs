@@ -62,6 +62,13 @@ namespace DirectPackageInstaller.ViewModels
             set => this.RaiseAndSetIfChanged(ref _debridLinkApiKey, value);
         }
 
+        private string _torBoxApiKey = null;
+        public string TorBoxApiKey
+        {
+            get => _torBoxApiKey;
+            set => this.RaiseAndSetIfChanged(ref _torBoxApiKey, value);
+        }
+
         private bool _ProxyMode = false;
         public bool ProxyMode 
         {
@@ -102,6 +109,13 @@ namespace DirectPackageInstaller.ViewModels
         {
             get => _useDebridLink;
             set => this.RaiseAndSetIfChanged(ref _useDebridLink, value);
+        }
+
+        private bool _useTorBox = false;
+        public bool UseTorBox
+        {
+            get => _useTorBox;
+            set => this.RaiseAndSetIfChanged(ref _useTorBox, value);
         }
 
         private bool _CNLService = false;
