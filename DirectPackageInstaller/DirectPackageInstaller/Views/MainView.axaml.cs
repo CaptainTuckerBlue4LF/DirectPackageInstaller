@@ -82,6 +82,8 @@ namespace DirectPackageInstaller.Views
             btnAllDebirdEnabled = this.Find<MenuItem>("btnAllDebirdEnabled");
             btnRealDebirdEnabled = this.Find<MenuItem>("btnRealDebirdEnabled");
             btnDebirdLinkEnabled = this.Find<MenuItem>("btnDebirdLinkEnabled");
+            btnTorBoxEnabled = this.Find<MenuItem>("btnTorBoxEnabled");
+            TransferProgress = this.Find<ProgressBar>("TransferProgress");
             btnSegmentedDownload = this.Find<MenuItem>("btnSegmentedDownload");
             btnTransferProgress = this.Find<MenuItem>("btnTransferProgress");
             btnCNLService = this.Find<MenuItem>("btnCNLService");
@@ -95,6 +97,7 @@ namespace DirectPackageInstaller.Views
             btnAllDebirdEnabled.Click += BtnAllDebirdEnabledOnClick;
             btnRealDebirdEnabled.Click += BtnRealDebirdEnabledOnClick;
             btnDebirdLinkEnabled.Click += BtnDebirdLinkEnabledOnClick;
+            btnTorBoxEnabled.Click += BtnTorBoxEnabledOnClick;
             btnSegmentedDownload.Click += BtnSegmentedDownloadOnClick;
             btnTransferProgress.Click += BtnTransferProgressOnClick;
             btnCNLService.Click += BtnCNLServiceOnClick;
@@ -146,8 +149,10 @@ namespace DirectPackageInstaller.Views
                 App.Config.AllDebridApiKey = IniReader.GetValue("AllDebridApiKey");
                 App.Config.UseRealDebrid = IniReader.GetBooleanValue("UseRealDebrid");
                 App.Config.UseDebridLink = IniReader.GetBooleanValue("UseDebridLink");
+                App.Config.UseTorBox = IniReader.GetBooleanValue("UseTorBox");
                 App.Config.RealDebridApiKey = IniReader.GetValue("RealDebridApiKey");
                 App.Config.DebridLinkApiKey = IniReader.GetValue("DebridLinkApiKey");
+                App.Config.TorBoxApiKey = IniReader.GetValue("TorBoxApiKey");
                 App.Config.EnableCNL = IniReader.GetBooleanValue("EnableCNL");
                 App.Config.ShowError = IniReader.GetBooleanValue("ShowError");
                 var ShowTransferProgress = IniReader.GetValue("ShowTransferProgress");
@@ -184,7 +189,9 @@ namespace DirectPackageInstaller.Views
                     SkipUpdateCheck = false,
                     EnableDHCP = false,
                     AllDebridApiKey = null,
-                    RealDebridApiKey = null
+                    RealDebridApiKey = null,
+                    TorBoxApiKey = null,
+                    UseTorBox = false
                 };
 
                 var DHCPHint = "With DirectPackageInstaller your PS4/PS5 and PC can do a \"Plug And Play\" network connection just enable the DHCP Server option and select your network adapter if needed.";
@@ -206,6 +213,7 @@ namespace DirectPackageInstaller.Views
             Model.ShowTransferProgress = App.Config.ShowTransferProgress;
             Model.UseAllDebrid = App.Config.UseAllDebrid;
             Model.UseDebridLink = App.Config.UseDebridLink;
+            Model.UseTorBox = App.Config.UseTorBox;
             Model.SegmentedMode = App.Config.SegmentedDownload;
             Model.UseRealDebrid = App.Config.UseRealDebrid;
             Model.PS4IP = App.Config.PSIP;
@@ -213,6 +221,7 @@ namespace DirectPackageInstaller.Views
             Model.AllDebridApiKey = App.Config.AllDebridApiKey;
             Model.RealDebridApiKey = App.Config.RealDebridApiKey;
             Model.DebridLinkApiKey = App.Config.DebridLinkApiKey;
+            Model.TorBoxApiKey = App.Config.TorBoxApiKey;
              
             if (App.Config.SearchPS4 || string.IsNullOrEmpty(App.Config.PSIP))
             {
@@ -821,6 +830,7 @@ namespace DirectPackageInstaller.Views
                     break;
                 case "ShowTransferProgress":
                     App.Config.ShowTransferProgress = Model.ShowTransferProgress;
+                    TransferProgress.IsVisible = Model.ShowTransferProgress && TransferProgress.Value > 0;
                     break;
                 case "PS4IP":
                     App.Config.PSIP = Model.PS4IP;
@@ -837,6 +847,9 @@ namespace DirectPackageInstaller.Views
                 case "UseDebridLink":
                     App.Config.UseDebridLink = Model.UseDebridLink;
                     break;
+                case "UseTorBox":
+                    App.Config.UseTorBox = Model.UseTorBox;
+                    break;
                 case "AllDebridApiKey":
                     App.Config.AllDebridApiKey = Model.AllDebridApiKey;
                     break;
@@ -845,6 +858,9 @@ namespace DirectPackageInstaller.Views
                     break;
                 case "DebridLinkApiKey":
                     App.Config.DebridLinkApiKey = Model.DebridLinkApiKey;
+                    break;
+                case "TorBoxApiKey":
+                    App.Config.TorBoxApiKey = Model.TorBoxApiKey;
                     break;
                 case "DHCPService":
                     App.Config.EnableDHCP = Model.DHCPService;
@@ -933,6 +949,12 @@ namespace DirectPackageInstaller.Views
                 return;
 
             Model.UseDebridLink = !Model.UseDebridLink;
+        }
+
+        private void BtnTorBoxEnabledOnClick(object? sender, RoutedEventArgs e)
+        {
+            if (Model != null)
+                Model.UseTorBox = !Model.UseTorBox;
         }
 
         private async Task<bool> Install(string URL, bool Silent)
@@ -1305,8 +1327,12 @@ namespace DirectPackageInstaller.Views
 
             App.Callback(() =>
             {
-                if (App.Config.ShowTransferProgress)
-                    Status.Text = ProgressStatus;
+                if (!App.Config.ShowTransferProgress)
+                    return;
+
+                TransferProgress.Value = Math.Clamp(Info.Percent * 100, 0, 100);
+                TransferProgress.IsVisible = true;
+                Status.Text = ProgressStatus;
             });
         }
 

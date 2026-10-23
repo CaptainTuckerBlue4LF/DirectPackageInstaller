@@ -93,6 +93,17 @@
                             </MenuItem.Icon>
                         </MenuItem>
                     </MenuItem>
+                    <MenuItem Header="_TorBox" Classes="NoChildFocus">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="API Key" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBox Width="150" Text="{Binding TorBoxApiKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                        <MenuItem Header="_Enabled" Padding="10,10,0,10" Name="btnTorBoxEnabled">
+                            <MenuItem.Icon>
+                                <CheckBox BorderThickness="0" IsChecked="{Binding UseTorBox, Mode=TwoWay}"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
                 </MenuItem>
                 
                 <MenuItem Header="_Restart Server" Name="btnRestartServer"/>
@@ -133,7 +144,10 @@
             </DataGrid>
         </Grid>
 
-        <TextBlock Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0" Name="Status"/>
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0">
+            <ProgressBar Name="TransferProgress" Minimum="0" Maximum="100" Height="8" Margin="5,3,5,0" IsVisible="False"/>
+            <TextBlock Name="Status"/>
+        </StackPanel>
     </Grid>
     <UserControl.Styles>
         <Style Selector="CheckBox">
